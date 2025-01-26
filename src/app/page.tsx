@@ -9,7 +9,7 @@ export default async function Home() {
   const bills = await getAllBills()
 
   return (
-    <Card className="border-0">
+    <Card className="border-0" suppressHydrationWarning>
       <div className="absolute top-5 right-5">
         <ModeToggle/>
       </div>
