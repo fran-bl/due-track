@@ -108,9 +108,9 @@ export function AddBillDialog() {
                                 <Input
                                     id="amount"
                                     type="number"
-                                    value={bill.amount}
+                                    value={bill.amount === 0 ? "" : bill.amount}
                                     onChange={handleInputChange}
-                                    step="0.01"
+                                    step={0.01}
                                     min="0"
                                     className={errors.amount ? "border-red-500" : ""}
                                 />

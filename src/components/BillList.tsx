@@ -1,23 +1,18 @@
 "use client"
 
-import { Suspense } from "react"
-import { BillCardSkeleton } from "./BillCardSkeleton"
-import BillListContent from "./BillListContent"
+import { Bill } from "./AddBillDialog";
+import { BillCard } from "./BillCard";
 
-export default function BillList() {
-    return (
-        <Suspense fallback={<BillListSkeleton/>}>
-            <BillListContent/>
-        </Suspense>
-    )
+interface BillListProps {
+    bills: Bill[];
 }
 
-function BillListSkeleton() {
+export default function BillList({ bills }: BillListProps) {
     return (
         <div className="grid grid-cols-2 gap-4">
-          {[...Array(4)].map((_, index) => (
-            <BillCardSkeleton key={index}/>
-          ))}
+            {bills?.map((bill: Bill, index: number) => (
+                <BillCard key={index} bill={bill} />
+            ))}
         </div>
     )
 }

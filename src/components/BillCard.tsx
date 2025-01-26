@@ -17,15 +17,17 @@ interface BillCardProps {
   bill: Bill;
 }
 
-export function BillCard({ key, bill }: BillCardProps) {
+export function BillCard({ bill }: BillCardProps) {
+  const dueDate = bill.due_date ? new Date(bill.due_date) : null
+
   return (
-    <Card key={key}>
+    <Card>
       <CardHeader>
         <CardDescription>{bill?.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <p>{bill.amount}</p>
-        <p>{bill?.due_date?.toLocaleDateString()}</p>
+        <p>{dueDate?.toLocaleDateString()}</p>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline">Cancel</Button>

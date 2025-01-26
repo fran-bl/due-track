@@ -24,9 +24,9 @@ export const getAllBills = async () => {
         if (error) {
             throw error
         }
-        console.log(data)
         return data
     } catch (error) {
         console.error("Error fetching bills:", error)
+        return []
     }
 }
