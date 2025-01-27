@@ -19,7 +19,6 @@ export default function BillList() {
     return (
         <div className="grid grid-cols-2 gap-4">
             {bills?.map((bill: DBBill, index: number) => (
-                console.log(bill),
                 <BillCard key={index} bill={bill} />
             ))}
         </div>
