@@ -18,7 +18,13 @@ interface BillCardProps {
 }
 
 export function BillCard({ bill }: BillCardProps) {
-  const dueDate = bill.due_date ? new Date(bill.due_date) : null
+  const [dueDate, setDueDate] = React.useState<Date | null>(null);
+
+  React.useEffect(() => {
+    if (bill.due_date) {
+      setDueDate(new Date(bill.due_date));
+    }
+  }, [bill.due_date]);
 
   return (
     <Card>
