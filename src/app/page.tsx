@@ -3,11 +3,8 @@ import BillList from "@/components/BillList";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
-import { getAllBills } from "./actions";
 
-export default async function Home() {
-  const bills = await getAllBills()
-
+export default function Home() {
   return (
     <Card className="border-0">
       <div className="absolute top-5 right-5">
@@ -20,7 +17,7 @@ export default async function Home() {
         <CardTitle className="text-3xl">DueTrack</CardTitle>
       </CardHeader>
       <CardContent>
-        <BillList bills={bills}/>
+        <BillList/>
       </CardContent>
     </Card>
   )

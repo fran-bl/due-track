@@ -13,20 +13,9 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Bill, BillErorrs } from "@/interfaces/interfaces"
 import React, { FormEvent } from "react"
 import { Calendar } from "./ui/calendar"
-
-export interface Bill {
-    description: string
-    amount: number
-    due_date: Date | undefined
-}
-
-interface BillErorrs {
-    description?: string
-    amount?: string
-    due_date?: string
-}
 
 export function AddBillDialog() {
     const [open, setOpen] = React.useState(false)

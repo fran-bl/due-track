@@ -1,16 +1,25 @@
 "use client"
 
-import { Bill } from "./AddBillDialog";
+import { getAllBills } from "@/app/actions";
+import { DBBill } from "@/interfaces/interfaces";
+import { useEffect, useState } from "react";
 import { BillCard } from "./BillCard";
 
-interface BillListProps {
-    bills: Bill[];
-}
+export default function BillList() {
+    const [bills, setBills] = useState<DBBill[]>([]);
 
-export default function BillList({ bills }: BillListProps) {
+    useEffect(() => {
+        async function fetchBills() {
+        const fetchedBills = await getAllBills();
+            setBills(fetchedBills);
+        }
+        fetchBills();
+    }, []);
+    
     return (
         <div className="grid grid-cols-2 gap-4">
-            {bills?.map((bill: Bill, index: number) => (
+            {bills?.map((bill: DBBill, index: number) => (
+                console.log(bill),
                 <BillCard key={index} bill={bill} />
             ))}
         </div>

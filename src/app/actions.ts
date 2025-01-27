@@ -1,6 +1,6 @@
 "use server"
 
-import { Bill } from "@/components/AddBillDialog"
+import { Bill } from "@/interfaces/interfaces"
 import { supabase } from "@/lib/supabase"
 
 export const createBill = async (bill: Bill) => {
