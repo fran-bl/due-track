@@ -17,12 +17,19 @@ import { Bill, BillErorrs } from "@/interfaces/interfaces"
 import React, { FormEvent } from "react"
 import { Calendar } from "./ui/calendar"
 
-export function AddBillDialog() {
+interface AddBillDialogProps {
+    onAdded: (bill: Bill) => void;
+}
+
+export function AddBillDialog({ onAdded }: AddBillDialogProps) {
     const [open, setOpen] = React.useState(false)
     const [bill, setBill] = React.useState<Bill>({
-        description: "",
+        id: undefined,
+        description: undefined,
         amount: 0,
-        due_date: undefined
+        due_date: undefined,
+        created_at: undefined,
+        is_paid: false,
     })
     const [errors, setErrors] = React.useState<Partial<BillErorrs>>({})
 
@@ -39,7 +46,7 @@ export function AddBillDialog() {
 
     const validateForm = (): boolean => {
         const newErrors: Partial<BillErorrs> = {}
-        if (!bill.description.trim()) {
+        if (!bill.description) {
             newErrors.description = "Description is required"
         }
         if (bill.amount <= 0) {
@@ -59,7 +66,15 @@ export function AddBillDialog() {
         }
         await createBill(bill)
         setOpen(false)
-        setBill({ description: "", amount: 0, due_date: undefined })
+        onAdded(bill)
+        setBill({ 
+            id: undefined,
+            description: undefined,
+            amount: 0,
+            due_date: undefined,
+            created_at: undefined,
+            is_paid: false,
+        })
     }
 
     return (
@@ -81,7 +96,7 @@ export function AddBillDialog() {
                             <div className="col-span-3">
                                 <Input
                                     id="description"
-                                    value={bill.description}
+                                    value={bill.description ? bill.description : ""}
                                     onChange={handleInputChange}
                                     placeholder="Electricity bill for the month of May"
                                     className={errors.description ? "border-red-500" : ""}

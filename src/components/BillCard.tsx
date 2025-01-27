@@ -10,11 +10,11 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { DBBill } from "@/interfaces/interfaces";
+import { Bill } from "@/interfaces/interfaces";
 
 interface BillCardProps {
   key: number;
-  bill: DBBill;
+  bill: Bill;
 }
 
 export function BillCard({ bill }: BillCardProps) {

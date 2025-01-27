@@ -1,15 +1,9 @@
 export interface Bill {
-    description: string
-    amount: number
-    due_date: Date | undefined
-}
-
-export interface DBBill {
-    id: number;
-    description: string;
+    id: number | undefined;
+    description: string | undefined;
     amount: number;
-    due_date: Date;
-    created_at: Date;
+    due_date: Date | undefined;
+    created_at: Date | undefined;
     is_paid: boolean;
 }
 
