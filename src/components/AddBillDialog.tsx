@@ -1,11 +1,10 @@
 "use client"
 
-import { createBill } from "@/app/actions"
+import { createBill, uploadImage } from "@/app/actions"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -13,7 +12,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Bill, BillErorrs } from "@/interfaces/interfaces"
+import { Bill, BillErrors } from "@/interfaces/interfaces"
+import { Check, Image, X } from "lucide-react"
 import React, { FormEvent } from "react"
 import { Calendar } from "./ui/calendar"
 
@@ -30,8 +30,10 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         due_date: undefined,
         created_at: undefined,
         is_paid: false,
+        img_url: undefined,
     })
-    const [errors, setErrors] = React.useState<Partial<BillErorrs>>({})
+    const [errors, setErrors] = React.useState<Partial<BillErrors>>({})
+    const [selectedImage, setSelectedImage] = React.useState<File | null>(null)
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
@@ -40,12 +42,21 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
     }
 
     const handleDateChange = (date: Date | undefined) => {
-        setBill({ ...bill,  due_date: date })
+        setBill({ ...bill,  due_date: date?.toISOString() })
         setErrors((prev) => ({ ...prev, due_date: undefined }))
     }
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file && file.type.startsWith("image/")) {
+            setSelectedImage(file)
+        } else {
+          setSelectedImage(null)
+        }
+      }
+
     const validateForm = (): boolean => {
-        const newErrors: Partial<BillErorrs> = {}
+        const newErrors: Partial<BillErrors> = {}
         if (!bill.description) {
             newErrors.description = "Description is required"
         }
@@ -54,6 +65,9 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         }
         if (!bill.due_date) {
             newErrors.due_date = "Due date is required"
+        }
+        if (!selectedImage) {
+            newErrors.img_url = "Image is required"
         }
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
@@ -64,8 +78,10 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         if (!validateForm()) {
             return
         }
-        await createBill(bill)
+        bill.img_url = await uploadImage(selectedImage)
+        bill.id = await createBill(bill)
         setOpen(false)
+        setSelectedImage(null)
         onAdded(bill)
         setBill({ 
             id: undefined,
@@ -74,31 +90,31 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
             due_date: undefined,
             created_at: undefined,
             is_paid: false,
+            img_url: undefined,
         })
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">Add bill</Button>
+                <Button variant="outline">Dodaj</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Add bill</DialogTitle>
-                        <DialogDescription>Add new bill:</DialogDescription>
+                        <DialogTitle>Dodaj novi račun</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="description" className="text-right">
-                                Description
+                                Opis
                             </Label>
                             <div className="col-span-3">
                                 <Input
                                     id="description"
                                     value={bill.description ? bill.description : ""}
                                     onChange={handleInputChange}
-                                    placeholder="Electricity bill for the month of May"
+                                    placeholder="HEPovci me opet gnjave"
                                     className={errors.description ? "border-red-500" : ""}
                                 />
                                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
@@ -106,13 +122,13 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="amount" className="text-right">
-                                Amount
+                                Iznos
                             </Label>
                             <div className="col-span-3">
                                 <Input
                                     id="amount"
                                     type="number"
-                                    value={bill.amount === 0 ? "" : bill.amount}
+                                    placeholder="0.00"
                                     onChange={handleInputChange}
                                     step={0.01}
                                     min="0"
@@ -122,11 +138,11 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                             </div>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label className="text-right">Due Date</Label>
+                            <Label className="text-right">Datum dospijeća</Label>
                             <div className="col-span-3">
                                 <Calendar
                                     mode="single"
-                                    selected={bill.due_date}
+                                    selected={bill.due_date ? new Date(bill.due_date) : undefined}
                                     onSelect={handleDateChange}
                                     fromDate={new Date()}
                                     initialFocus
@@ -134,9 +150,30 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                                 {errors.due_date && <p className="text-red-500 text-sm mt-1">{errors.due_date}</p>}
                             </div>
                         </div>
+                        <div className="grid grid-cols-5 items-center gap-4">
+                            <Label className="text-right">Slika</Label>
+                            <Label htmlFor="image" className="col-span-2">
+                                { /* eslint-disable-next-line jsx-a11y/alt-text */ }
+                                <Image size="30" className="cursor-pointer ml-24"/>
+                            </Label>
+                            {selectedImage ? 
+                                <Check size="40" className="col-span-1" color="green"/> :
+                                <X size="40" className="col-span-1" color="red"/>
+                            }               
+                            <div className="col-span-1">
+                                <Input
+                                    id="image"
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    onChange={handleFileChange}
+                                />
+                                {errors.img_url && <p className="text-red-500 text-sm mt-1">{errors.img_url}</p>}
+                            </div>                            
+                        </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Save changes</Button>
+                        <Button type="submit">Dodaj</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -1,14 +1,16 @@
 export interface Bill {
-    id: number | undefined;
-    description: string | undefined;
+    id?: string;
+    description?: string;
     amount: number;
-    due_date: Date | undefined;
-    created_at: Date | undefined;
+    due_date?: string;
+    created_at?: string;
     is_paid: boolean;
+    img_url?: string;
 }
 
-export interface BillErorrs {
+export interface BillErrors {
     description?: string
     amount?: string
     due_date?: string
+    img_url?: string
 }
