@@ -25,7 +25,7 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
     const [open, setOpen] = React.useState(false)
     const [bill, setBill] = React.useState<Bill>({
         id: undefined,
-        description: undefined,
+        description: "",
         amount: 0,
         due_date: undefined,
         created_at: undefined,
@@ -78,14 +78,14 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         if (!validateForm()) {
             return
         }
-        bill.img_url = await uploadImage(selectedImage)
+        bill.img_url = await uploadImage(selectedImage, bill.description)
         bill.id = await createBill(bill)
         setOpen(false)
         setSelectedImage(null)
         onAdded(bill)
         setBill({ 
             id: undefined,
-            description: undefined,
+            description: "",
             amount: 0,
             due_date: undefined,
             created_at: undefined,
@@ -112,7 +112,7 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                             <div className="col-span-3">
                                 <Input
                                     id="description"
-                                    value={bill.description ? bill.description : ""}
+                                    value={bill.description}
                                     onChange={handleInputChange}
                                     placeholder="HEPovci me opet gnjave"
                                     className={errors.description ? "border-red-500" : ""}
@@ -154,11 +154,11 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                             <Label className="text-right">Slika</Label>
                             <Label htmlFor="image" className="col-span-2">
                                 { /* eslint-disable-next-line jsx-a11y/alt-text */ }
-                                <Image size="30" className="cursor-pointer ml-24"/>
+                                <Image className="cursor-pointer ml-24"/>
                             </Label>
                             {selectedImage ? 
-                                <Check size="40" className="col-span-1" color="green"/> :
-                                <X size="40" className="col-span-1" color="red"/>
+                                <Check className="col-span-1" color="green"/> :
+                                <X className="col-span-1" color="red"/>
                             }               
                             <div className="col-span-1">
                                 <Input

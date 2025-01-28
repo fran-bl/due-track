@@ -3,12 +3,14 @@
 import { Bill } from "@/interfaces/interfaces"
 import { supabase } from "@/lib/supabase"
 
-export const uploadImage = async (file: File | null) => {
+export const uploadImage = async (file: File | null, desc: string) => {
     if (file) {
         try {
+            const extension = file.name.split('.').pop()
+
             const { data, error } = await supabase.storage
                 .from("bill-img")
-                .upload(`${file.name}`, file, { upsert: true })
+                .upload(`bills/${desc}.${extension}`, file, { upsert: true })
 
             if (error) {
                 throw error
@@ -54,7 +56,7 @@ export const getAllBills = async () => {
     }
 }
 
-export const deleteBill = async (id: string | undefined) => {
+export const deleteBill = async (id: string | undefined, img_url: string | undefined) => {
     try {
         const { error } = await supabase
             .from("bills")
@@ -65,6 +67,22 @@ export const deleteBill = async (id: string | undefined) => {
         }
     } catch (error) {
         console.error("Error deleting bill:", error)
+    }
+
+    if (img_url) {
+        try {
+            const filePath = img_url.split('/storage/v1/object/public/bill-img/')[1];
+
+            const { error } = await supabase.storage
+                .from('bill-img')
+                .remove([filePath]);
+
+            if (error) {
+                throw error
+            }
+        } catch (error) {
+            console.error('Error deleting image:', error);
+        }
     }
 }
 
