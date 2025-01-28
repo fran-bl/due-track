@@ -144,7 +144,6 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                                     mode="single"
                                     selected={bill.due_date ? new Date(bill.due_date) : undefined}
                                     onSelect={handleDateChange}
-                                    fromDate={new Date()}
                                     initialFocus
                                 />
                                 {errors.due_date && <p className="text-red-500 text-sm mt-1">{errors.due_date}</p>}

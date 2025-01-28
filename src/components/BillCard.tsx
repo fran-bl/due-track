@@ -21,12 +21,13 @@ import { Dialog, DialogContent } from "./ui/dialog";
 
 interface BillCardProps {
   key: number;
+  isAdmin: boolean;
   bill: Bill;
   onSetPaid: (id: string | undefined) => void;
   onDelete: (id: string | undefined, img_url: string | undefined) => void;
 }
 
-export function BillCard({ bill, onSetPaid, onDelete }: BillCardProps) {
+export function BillCard({ isAdmin, bill, onSetPaid, onDelete }: BillCardProps) {
   const [isImageOpen, setIsImageOpen] = React.useState(false);
 
   const handleDownload = () => {
@@ -41,7 +42,7 @@ export function BillCard({ bill, onSetPaid, onDelete }: BillCardProps) {
         (bill.due_date && new Date(bill.due_date) < new Date() && !bill.is_paid ? "border-red-500 border-4" : "")
       }>
         {bill.img_url ?
-          <CardContent className="aspect-square relative overflow-hidden rounded-lg" onClick={() => setIsImageOpen(true)}>
+          <CardContent className="relative overflow-hidden rounded-lg p-3" style={{ aspectRatio: "2/1" }} onClick={() => setIsImageOpen(true)}>
             <Image 
               src={bill.img_url}
               fill
@@ -49,7 +50,7 @@ export function BillCard({ bill, onSetPaid, onDelete }: BillCardProps) {
               alt="Image"
             />
           </CardContent> :
-          <CardContent className="aspect-square relative overflow-hidden rounded-lg">
+          <CardContent className="aspect-square relative overflow-hidden rounded-lg p-3">
             <Image 
               src="/placeholder.jpg"
               fill
@@ -58,17 +59,17 @@ export function BillCard({ bill, onSetPaid, onDelete }: BillCardProps) {
             />
           </CardContent>
         }
-        <CardHeader className="flex justify-between items-center">
-          <CardTitle className="text-3xl">{bill.description}</CardTitle>
-          <Download className="w-8 h-8 cursor-pointer" onClick={handleDownload} />
+        <CardHeader className="grid grid-cols-2 items-center place-items-center p-3">
+          <CardTitle className="text-xl col-span-1">{bill.description}</CardTitle>
+          <Download className="w-8 h-8 cursor-pointer col-span-1" onClick={handleDownload} />
         </CardHeader>
-        <CardContent>
-          <p className="text-2xl text-right gradient-text text-transparent animate-gradient">{bill.amount + " €"}</p>
+        <CardContent className="p-3">
+          <p className="text-2xl text-right gradient-text text-transparent animate-gradient">{bill.amount.toLocaleString() + " €"}</p>
           {bill.due_date && (
             <>
               <div className="flex justify-between">
-                <Label htmlFor="due-date" className="text-xl">Datum dospijeća:</Label>
-                <p className="text-right text-2xl" id="due-date">
+                <Label htmlFor="due-date" className="text-lg">Datum dospijeća:</Label>
+                <p className="text-right text-xl" id="due-date">
                   {new Date(bill.due_date).toLocaleDateString('de-DE', {
                     year: 'numeric',
                     month: '2-digit',
@@ -76,17 +77,20 @@ export function BillCard({ bill, onSetPaid, onDelete }: BillCardProps) {
                   }) + "."}
                 </p>
               </div>
-                <p className="text-right text-primary text-xl">
+                <p className="text-right text-primary text-lg">
                   {(() => {
-                    const diff = new Date(bill.due_date).getTime() - new Date().getTime();
-                    return diff > 0 ? <>{`(za ${Math.ceil(diff / (1000 * 60 * 60 * 24))} dan/a)`}</> : <>&nbsp;</>       
+                    const diff = new Date(bill.due_date).getTime() - new Date().getTime()
+                    const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+                    return diff > 0 ? <>{`(za ${days} dan` + (days === 1 ? ")" : "a)")}</> : <>&nbsp;</>       
                   })()}
                 </p>
             </>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={() => onDelete(bill.id, bill.img_url)}>Obriši</Button>
+        <CardFooter className="grid grid-cols-2 items-center p-3 gap-5">
+          {isAdmin && (
+            <Button variant="outline" onClick={() => onDelete(bill.id, bill.img_url)}>Obriši</Button>
+          )}
           {!bill.is_paid && (
             <Button variant="outline" onClick={() => onSetPaid(bill.id)}>Označi kao plaćen</Button>
           )}

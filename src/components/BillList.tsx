@@ -2,15 +2,16 @@
 
 import { deleteBill, getAllBills, markBillAsPaid } from "@/app/actions";
 import { Bill } from "@/interfaces/interfaces";
+import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { AddBillDialog } from "./AddBillDialog";
 import { BillCard } from "./BillCard";
 import { FilterDropdown } from "./FilterDropdown";
 
-export default function BillList() {
+export default function BillList({ user }: { user: User }) {
     const [bills, setBills] = useState<Bill[]>([]);
-    //const [filteredBills, setFilteredBills] = useState<Bill[]>([]);
     const [filter, setFilter] = useState("svi");
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         async function fetchBills() {
@@ -18,7 +19,8 @@ export default function BillList() {
             setBills(sortBills(fetchedBills));
         }
         fetchBills();
-    }, []);
+        setIsAdmin(!!(user && user.email?.includes("admin")));
+    }, [user]);
 
     const handleNewBill = (newBill: Bill) => {
         setBills(sortBills([...bills, newBill]));
@@ -60,9 +62,11 @@ export default function BillList() {
     }
     
     return (
-        <div className="grid grid-cols-3 max-lg:grid-cols-1 gap-4">
+        <div className="grid grid-cols-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 gap-4">
             <div className="grid grid-cols-2 gap-1 absolute top-5 left-5">
-                <AddBillDialog onAdded={handleNewBill}/>
+                {isAdmin && (
+                    <AddBillDialog onAdded={handleNewBill}/>
+                )}
                 <FilterDropdown filter={filter} onFilterChange={handleChangeFilter}/>
             </div>
             {bills?.filter(
@@ -71,7 +75,7 @@ export default function BillList() {
                     filter === "neplaceni" ? !bill.is_paid : 
                     filter === "zakasnjeli" ? bill.due_date && new Date(bill.due_date) < new Date() && !bill.is_paid : true
             ).map((bill: Bill, index: number) => (
-                <BillCard key={index} bill={bill} onSetPaid={handlePaid} onDelete={handleDelete}/>
+                <BillCard key={index} isAdmin={isAdmin} bill={bill} onSetPaid={handlePaid} onDelete={handleDelete}/>
             ))}
         </div>
     )

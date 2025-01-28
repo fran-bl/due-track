@@ -1,11 +1,13 @@
 "use server"
 
 import { Bill } from "@/interfaces/interfaces"
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/utils/supabase/server"
 
 export const uploadImage = async (file: File | null, desc: string) => {
     if (file) {
         try {
+            const supabase = await createClient()
+
             const extension = file.name.split('.').pop()
 
             const { data, error } = await supabase.storage
@@ -27,6 +29,8 @@ export const uploadImage = async (file: File | null, desc: string) => {
 
 export const createBill = async (bill: Bill) => {
     try {            
+        const supabase =  await createClient()
+
         const { data, error } = await supabase
             .from("bills")
             .insert([bill])
@@ -43,6 +47,8 @@ export const createBill = async (bill: Bill) => {
 
 export const getAllBills = async () => {
     try {
+        const supabase = await createClient()
+
         const { data, error } = await supabase
             .from("bills")
             .select("*")
@@ -57,7 +63,9 @@ export const getAllBills = async () => {
 }
 
 export const deleteBill = async (id: string | undefined, img_url: string | undefined) => {
-    try {
+    const supabase = await createClient()
+
+    try {        
         const { error } = await supabase
             .from("bills")
             .delete()
@@ -88,6 +96,8 @@ export const deleteBill = async (id: string | undefined, img_url: string | undef
 
 export const markBillAsPaid = async (id: string | undefined) => {
     try {
+        const supabase = await createClient()
+        
         const { error } = await supabase
             .from("bills")
             .update({ is_paid: true })
