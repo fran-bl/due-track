@@ -22,7 +22,7 @@ export default async function Home() {
         <CardTitle className="text-3xl">DueTrack</CardTitle>
       </CardHeader>
       <CardContent>
-        <BillList user={data.user}/>
+        <BillList/>
       </CardContent>
     </Card>
   )

@@ -21,13 +21,13 @@ import { Dialog, DialogContent } from "./ui/dialog";
 
 interface BillCardProps {
   key: number;
-  isAdmin: boolean;
+  userRole: string | null;
   bill: Bill;
   onSetPaid: (id: string | undefined) => void;
   onDelete: (id: string | undefined, img_url: string | undefined) => void;
 }
 
-export function BillCard({ isAdmin, bill, onSetPaid, onDelete }: BillCardProps) {
+export function BillCard({ userRole, bill, onSetPaid, onDelete }: BillCardProps) {
   const [isImageOpen, setIsImageOpen] = React.useState(false);
 
   const handleDownload = () => {
@@ -50,7 +50,7 @@ export function BillCard({ isAdmin, bill, onSetPaid, onDelete }: BillCardProps) 
               alt="Image"
             />
           </CardContent> :
-          <CardContent className="aspect-square relative overflow-hidden rounded-lg p-3">
+          <CardContent className="aspect-square relative overflow-hidden rounded-lg p-3" style={{ aspectRatio: "2/1" }}>
             <Image 
               src="/placeholder.jpg"
               fill
@@ -88,7 +88,7 @@ export function BillCard({ isAdmin, bill, onSetPaid, onDelete }: BillCardProps) 
           )}
         </CardContent>
         <CardFooter className="grid grid-cols-2 items-center p-3 gap-5">
-          {isAdmin && (
+          {userRole === "admin" && (
             <Button variant="outline" onClick={() => onDelete(bill.id, bill.img_url)}>Obriši</Button>
           )}
           {!bill.is_paid && (
