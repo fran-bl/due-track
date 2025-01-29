@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Bill, BillErrors } from "@/interfaces/interfaces"
 import { Check, Image, X } from "lucide-react"
 import React, { FormEvent } from "react"
+import { toast } from "react-toastify"
 import { Calendar } from "./ui/calendar"
 
 interface AddBillDialogProps {
@@ -78,8 +79,18 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         if (!validateForm()) {
             return
         }
-        bill.img_url = await uploadImage(selectedImage, bill.description)
+
+        const uploadResult = await uploadImage(selectedImage, bill.description)
+
+        if (uploadResult.success) {
+            bill.img_url = uploadResult.url
+            toast("Račun uspješno dodan")
+        } else {
+            toast("Greška prilikom uploada slike")
+        }
+
         bill.id = await createBill(bill)
+        
         setOpen(false)
         setSelectedImage(null)
         onAdded(bill)
