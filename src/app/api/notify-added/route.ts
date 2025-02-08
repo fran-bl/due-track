@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next"
+import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 
@@ -8,13 +8,9 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" })
-  }
-
+export async function POST(request: Request) {
   try {
-    const { inserted_data } = req.body
+    const { inserted_data } = await request.json()
 
     // Fetch all user emails
     const { data: users, error } = await supabase.from("auth.users").select("email")
@@ -31,9 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    res.status(200).json({ message: "Emails sent successfully" })
+    return NextResponse.json({ message: "Emails sent successfully" }, { status: 200 })
   } catch (error) {
     console.error("Error sending emails:", error)
-    res.status(500).json({ message: "Error sending emails", error: error })
+    return NextResponse.json({ message: "Error sending emails", error: error }, { status: 500 })
   }
 }
+
