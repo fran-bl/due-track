@@ -22,7 +22,7 @@ export async function GET() {
         to: user.email,
         subject: "Dodan novi račun u DueTrack",
         html: `
-          <p>Dodan je novi račun u aplikaciju DueTrack!</p>
+          <p>Dodan je novi račun u aplikaciju <a href="https://due-track.vercel.app">DueTrack</a>!</p>
         `,
       })
     }
