@@ -2,18 +2,18 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 
-// Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request: Request) {
   try {
     const { inserted_data } = await request.json()
 
+    // Initialize Supabase client
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+
+    // Initialize Resend
+    const resend = new Resend(process.env.RESEND_API_KEY)
+
     // Fetch all user emails
-    const { data: users, error } = await supabase.from("auth.users").select("email")
+    const { data: users, error } = await supabase.from("user_emails").select("email")
 
     if (error) throw error
 
@@ -22,8 +22,11 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: "noreply@fran-blazevic.from.hr",
         to: user.email,
-        subject: "New Record Inserted",
-        html: `<p>A new record has been inserted:</p><pre>${JSON.stringify(inserted_data, null, 2)}</pre>`,
+        subject: "Dodan novi račun u DueTrack",
+        html: `
+          <p>Dodan je novi račun u aplikaciju DueTrack:</p>
+          <pre>${JSON.stringify(inserted_data, null, 2)}</pre>
+        `,
       })
     }
 
