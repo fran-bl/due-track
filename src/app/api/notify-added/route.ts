@@ -2,10 +2,8 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { Resend } from "resend"
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
-    const { inserted_data } = await request.json()
-
     // Initialize Supabase client
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
@@ -24,8 +22,7 @@ export async function POST(request: Request) {
         to: user.email,
         subject: "Dodan novi račun u DueTrack",
         html: `
-          <p>Dodan je novi račun u aplikaciju DueTrack:</p>
-          <pre>${JSON.stringify(inserted_data, null, 2)}</pre>
+          <p>Dodan je novi račun u aplikaciju DueTrack!</p>
         `,
       })
     }
