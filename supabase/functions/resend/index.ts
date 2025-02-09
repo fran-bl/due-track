@@ -28,6 +28,7 @@ serve(async (req) => {
   const billContent = `
     <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
       <h2 style="font-size: 24px; color: #2a2a2a;">Dodan je novi račun:</h2>
+      <img src="${newBill.img_url}" alt="image" style="max-width: 300px; max-height: 300px; width: auto; height: auto;"/>
       <ul style="font-size: 18px; list-style-type: none; padding-left: 0;">
         <li style="margin-bottom: 8px;"><strong>Opis:</strong> ${newBill.description}</li>
         <li style="margin-bottom: 8px;"><strong>Iznos:</strong> ${newBill.amount} €</li>
