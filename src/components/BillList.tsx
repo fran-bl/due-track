@@ -71,9 +71,12 @@ export default function BillList() {
 
     const sortBills = (bills: Bill[]) => {
         return bills.sort((a, b) => {
-            const dateA = a.due_date ? new Date(a.due_date).getTime() : 0;
-            const dateB = b.due_date ? new Date(b.due_date).getTime() : 0;
-            return dateA - dateB;
+            if (a.is_paid === b.is_paid) {
+                const dateA = a.due_date ? new Date(a.due_date).getTime() : 0;
+                const dateB = b.due_date ? new Date(b.due_date).getTime() : 0;
+                return dateA - dateB;
+            }
+            return a.is_paid ? 1 : -1;
         });
     }
 
