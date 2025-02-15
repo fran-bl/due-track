@@ -14,7 +14,7 @@ export default async function Home() {
   }
 
   return (
-    <Card className="h-screen">
+    <Card className="h-full border-0 shadow-none">
       <div className="absolute top-5 right-5">
         <ModeToggle/>
       </div>
