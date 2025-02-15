@@ -14,11 +14,11 @@ export default async function Home() {
   }
 
   return (
-    <Card className="border-0">
+    <Card className="h-screen">
       <div className="absolute top-5 right-5">
         <ModeToggle/>
       </div>
-      <CardHeader className="items-center">
+      <CardHeader className="items-center h-32">
         <CardTitle className="text-3xl">DueTrack</CardTitle>
       </CardHeader>
       <CardContent>

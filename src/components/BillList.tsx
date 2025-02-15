@@ -86,7 +86,7 @@ export default function BillList() {
     
     return (
         <div className="grid grid-cols-4 max-sm:grid-cols-1 max-md:grid-cols-2 max-lg:grid-cols-3 gap-4">
-            <div className="grid grid-cols-2 gap-1 absolute top-5 left-5">
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-1 absolute top-5 left-5">
                 {userRole === "admin" && (
                     <AddBillDialog onAdded={handleNewBill}/>
                 )}

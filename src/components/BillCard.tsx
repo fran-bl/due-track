@@ -60,7 +60,7 @@ export function BillCard({ userRole, bill, onSetPaid, onDelete }: BillCardProps)
           </CardContent>
         }
         <CardHeader className="grid grid-cols-2 items-center place-items-center p-3">
-          <CardTitle className="text-xl col-span-1">{bill.description}</CardTitle>
+          <CardTitle className="text-xl col-span-1 max-md:text-sm">{bill.description}</CardTitle>
           <Download className="w-8 h-8 cursor-pointer col-span-1" onClick={handleDownload} />
         </CardHeader>
         <CardContent className="p-3">
