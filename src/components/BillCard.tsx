@@ -18,6 +18,7 @@ import { saveAs } from 'file-saver';
 import { Download } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent } from "./ui/dialog";
+import { EditBillDialog } from "./EditBillDialog";
 
 interface BillCardProps {
   key: number;
@@ -25,9 +26,10 @@ interface BillCardProps {
   bill: Bill;
   onSetPaid: (id: string | undefined) => void;
   onDelete: (id: string | undefined, img_url: string | undefined) => void;
+  onChange: (bill: Bill) => void;
 }
 
-export function BillCard({ userRole, bill, onSetPaid, onDelete }: BillCardProps) {
+export function BillCard({ userRole, bill, onSetPaid, onDelete, onChange }: BillCardProps) {
   const [isImageOpen, setIsImageOpen] = React.useState(false);
 
   const handleDownload = () => {
@@ -87,12 +89,15 @@ export function BillCard({ userRole, bill, onSetPaid, onDelete }: BillCardProps)
             </>
           )}
         </CardContent>
-        <CardFooter className="grid grid-cols-2 items-center p-3 gap-5">
+        <CardFooter className="grid grid-cols-3 items-center p-3 gap-5">
           {userRole === "admin" && (
-            <Button variant="outline" onClick={() => onDelete(bill.id, bill.img_url)}>Obriši</Button>
+            <>
+              <Button variant="outline" onClick={() => onDelete(bill.id, bill.img_url)}>Obriši</Button>
+              <EditBillDialog onChanged={onChange} initialBill={bill}/>
+            </>
           )}
           {!bill.is_paid && (
-            <Button variant="outline" onClick={() => onSetPaid(bill.id)}>Označi kao plaćen</Button>
+            <Button variant="outline" onClick={() => onSetPaid(bill.id)}>Plaćen</Button>
           )}
         </CardFooter>
       </Card>

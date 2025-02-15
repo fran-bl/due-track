@@ -118,3 +118,19 @@ export const markBillAsPaid = async (id: string | undefined) => {
         console.error("Error updating bill:", error)
     }
 }
+
+export const editBill = async (bill: Bill) => {
+    try {
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from("bills")
+            .update(bill)
+            .eq("id", bill.id)
+        if (error) {
+            throw error
+        }
+    } catch (error) {
+        console.error("Error updating bill:", error)
+    }
+}

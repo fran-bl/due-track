@@ -1,6 +1,6 @@
 "use client"
 
-import { deleteBill, getAllBills, markBillAsPaid } from "@/app/actions";
+import { deleteBill, editBill, getAllBills, markBillAsPaid } from "@/app/actions";
 import { Bill } from "@/interfaces/interfaces";
 import { createClient } from "@/utils/supabase/client";
 import { jwtDecode } from "jwt-decode";
@@ -69,6 +69,15 @@ export default function BillList() {
         setBills(sortBills(bills.filter(bill => bill.id !== id)));
     }
 
+    const handleEdit = (bill: Bill) => {
+        async function editBillFn() {
+            await editBill(bill);
+        }
+        editBillFn();
+
+        setBills(sortBills(bills.map(b => b.id === bill.id ? bill : b)));
+    }
+
     const sortBills = (bills: Bill[]) => {
         return bills.sort((a, b) => {
             if (a.is_paid === b.is_paid) {
@@ -98,7 +107,7 @@ export default function BillList() {
                     filter === "neplaceni" ? !bill.is_paid : 
                     filter === "zakasnjeli" ? bill.due_date && new Date(bill.due_date) < new Date() && !bill.is_paid : true
             ).map((bill: Bill, index: number) => (
-                <BillCard key={index} userRole={userRole} bill={bill} onSetPaid={handlePaid} onDelete={handleDelete}/>
+                <BillCard key={index} userRole={userRole} bill={bill} onSetPaid={handlePaid} onDelete={handleDelete} onChange={handleEdit}/>
             ))}
         </div>
     )

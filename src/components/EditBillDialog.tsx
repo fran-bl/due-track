@@ -1,6 +1,5 @@
 "use client"
 
-import { createBill, uploadImage } from "@/app/actions"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -13,28 +12,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Bill, BillErrors } from "@/interfaces/interfaces"
-import { Check, Image, X } from "lucide-react"
 import React, { FormEvent } from "react"
-import { toast } from "react-toastify"
 import { Calendar } from "./ui/calendar"
 
-interface AddBillDialogProps {
-    onAdded: (bill: Bill) => void;
+interface EditBillDialogProps {
+    onChanged: (bill: Bill) => void
+    initialBill: Bill
 }
 
-export function AddBillDialog({ onAdded }: AddBillDialogProps) {
+export function EditBillDialog({ onChanged, initialBill }: EditBillDialogProps) {
     const [open, setOpen] = React.useState(false)
-    const [bill, setBill] = React.useState<Bill>({
-        id: undefined,
-        description: "",
-        amount: 0,
-        due_date: undefined,
-        created_at: undefined,
-        is_paid: false,
-        img_url: undefined,
-    })
+    const [bill, setBill] = React.useState<Bill>(initialBill)
     const [errors, setErrors] = React.useState<Partial<BillErrors>>({})
-    const [selectedImage, setSelectedImage] = React.useState<File | null>(null)
+
+    React.useEffect(() => {
+        setBill(initialBill)
+    }, [initialBill])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target
@@ -47,14 +40,9 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         setErrors((prev) => ({ ...prev, due_date: undefined }))
     }
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file && file.type.startsWith("image/")) {
-            setSelectedImage(file)
-        } else {
-          setSelectedImage(null)
-        }
-      }
+    const togglePaid = () => {
+        setBill({ ...bill, is_paid: !bill.is_paid })
+    }
 
     const validateForm = (): boolean => {
         const newErrors: Partial<BillErrors> = {}
@@ -67,9 +55,6 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         if (!bill.due_date) {
             newErrors.due_date = "Datum dospijeća je obavezan"
         }
-        if (!selectedImage) {
-            newErrors.img_url = "Slika je obavezna"
-        }
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -79,41 +64,20 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
         if (!validateForm()) {
             return
         }
-
-        const uploadResult = await uploadImage(selectedImage, bill.description)
-
-        if (uploadResult.success) {
-            bill.img_url = uploadResult.url
-            toast("Račun uspješno dodan")
-        } else {
-            toast("Greška prilikom uploada slike")
-        }
-
-        bill.id = await createBill(bill)
         
         setOpen(false)
-        setSelectedImage(null)
-        onAdded(bill)
-        setBill({ 
-            id: undefined,
-            description: "",
-            amount: 0,
-            due_date: undefined,
-            created_at: undefined,
-            is_paid: false,
-            img_url: undefined,
-        })
+        onChanged(bill)
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">Dodaj</Button>
+                <Button variant="outline">Ažuriraj</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Dodaj novi račun</DialogTitle>
+                        <DialogTitle>Ažuriraj račun</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -143,6 +107,7 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                                     onChange={handleInputChange}
                                     step={0.01}
                                     min="0"
+                                    value={bill.amount}
                                     className={errors.amount ? "border-red-500" : ""}
                                 />
                                 {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
@@ -160,30 +125,24 @@ export function AddBillDialog({ onAdded }: AddBillDialogProps) {
                                 {errors.due_date && <p className="text-red-500 text-sm mt-1">{errors.due_date}</p>}
                             </div>
                         </div>
-                        <div className="grid grid-cols-5 items-center gap-4">
-                            <Label className="text-right">Slika</Label>
-                            <Label htmlFor="image" className="col-span-2">
-                                { /* eslint-disable-next-line jsx-a11y/alt-text */ }
-                                <Image className="cursor-pointer ml-24"/>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="is_paid" className="text-right">
+                                Status
                             </Label>
-                            {selectedImage ? 
-                                <Check className="col-span-1" color="green"/> :
-                                <X className="col-span-1" color="red"/>
-                            }               
-                            <div className="col-span-1">
-                                <Input
-                                    id="image"
-                                    type="file"
-                                    accept="image/*"
-                                    style={{ display: "none" }}
-                                    onChange={handleFileChange}
-                                />
-                                {errors.img_url && <p className="text-red-500 text-sm mt-1">{errors.img_url}</p>}
-                            </div>                            
+                            <div className="col-span-3">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className={bill.is_paid ? "bg-green-500" : "bg-red-500"}
+                                    onClick={togglePaid}
+                                >
+                                    {bill.is_paid ? "Plaćen" : "Nije plaćen"}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Dodaj</Button>
+                        <Button type="submit">Spremi</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
